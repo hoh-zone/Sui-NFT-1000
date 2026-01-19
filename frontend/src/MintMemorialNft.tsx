@@ -65,7 +65,7 @@ export function MintMemorialNft({ strings }: MintMemorialNftProps) {
     if (!sharedVersion) return;
     const tx = new Transaction();
     tx.moveCall({
-      target: `${packageId}::memorial_nft::mint`,
+      target: `${packageId}::memorial::mint`,
       arguments: [
         tx.sharedObjectRef({
           objectId: counterId,
@@ -74,6 +74,7 @@ export function MintMemorialNft({ strings }: MintMemorialNftProps) {
         }),
       ],
     });
+
     signAndExecuteTransaction({ transaction: tx });
   };
 
