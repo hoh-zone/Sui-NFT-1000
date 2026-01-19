@@ -1,0 +1,70 @@
+.app-shell {
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+  padding-bottom: 64px;
+}
+
+.background-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 32px 32px;
+  mask-image: radial-gradient(circle at top, rgba(0, 0, 0, 0.9), transparent 70%);
+  pointer-events: none;
+}
+
+.background-glow {
+  position: absolute;
+  inset: -30% 10% auto 10%;
+  height: 420px;
+  background: radial-gradient(circle, rgba(98, 141, 255, 0.45), transparent 65%);
+  filter: blur(40px);
+  pointer-events: none;
+}
+
+.app-nav {
+  z-index: 2;
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--gray-a3);
+  background: color-mix(in srgb, var(--color-background) 70%, transparent);
+}
+
+.app-content {
+  position: relative;
+  z-index: 1;
+  padding-top: 40px;
+}
+
+.card-panel {
+  border-radius: 20px;
+  padding: 28px;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-background) 70%, transparent),
+    color-mix(in srgb, var(--color-background) 90%, transparent)
+  );
+  border: 1px solid var(--gray-a3);
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.25);
+  backdrop-filter: blur(16px);
+}
+
+.glow-button {
+  box-shadow: 0 0 16px rgba(99, 164, 255, 0.35);
+}
+
+@media (prefers-color-scheme: light) {
+  .background-grid {
+    background-image:
+      linear-gradient(rgba(10, 15, 30, 0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(10, 15, 30, 0.08) 1px, transparent 1px);
+  }
+  .background-glow {
+    background: radial-gradient(circle, rgba(78, 128, 255, 0.25), transparent 70%);
+  }
+  .card-panel {
+    box-shadow: 0 20px 60px rgba(15, 23, 42, 0.12);
+  }
+}
