@@ -4,6 +4,24 @@
 [move]
 version = 4
 
+[pinned.mainnet.MoveStdlib]
+source = { local = "/Users/mac/.move/https___github_com_MystenLabs_sui_git_framework__testnet/crates/sui-framework/packages/move-stdlib" }
+use_environment = "mainnet"
+manifest_digest = "C4FE4C91DE74CBF223B2E380AE40F592177D21870DC2D7EB6227D2D694E05363"
+deps = {}
+
+[pinned.mainnet.Sui]
+source = { local = "/Users/mac/.move/https___github_com_MystenLabs_sui_git_framework__testnet/crates/sui-framework/packages/sui-framework" }
+use_environment = "mainnet"
+manifest_digest = "CD547CB1ACCE0880C835DAED2D8FFCB91D56C833AE5240D3AA5B918398263195"
+deps = { MoveStdlib = "MoveStdlib" }
+
+[pinned.mainnet.memorial_nft]
+source = { root = true }
+use_environment = "mainnet"
+manifest_digest = "2D71896DD9007D9FFEEDE399895EF8887689A51C4333B2E3F0720079D37E86AC"
+deps = { MoveStdlib = "MoveStdlib", Sui = "Sui" }
+
 [pinned.testnet.MoveStdlib]
 source = { local = "/Users/mac/.move/https___github_com_MystenLabs_sui_git_framework__testnet/crates/sui-framework/packages/move-stdlib" }
 use_environment = "testnet"

@@ -41,7 +41,7 @@ export function MintMemorialNft({ strings }: MintMemorialNftProps) {
 
   const sharedVersion = useMemo(() => {
     const owner = counterObject?.data?.owner;
-    if (owner && "Shared" in owner) {
+    if (owner && typeof owner === "object" && "Shared" in owner) {
       return owner.Shared.initial_shared_version;
     }
     return null;

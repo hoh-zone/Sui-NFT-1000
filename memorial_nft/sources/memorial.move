@@ -72,7 +72,7 @@ fun init(otw: MEMORIAL, ctx: &mut sui::tx_context::TxContext) {
     let mut name = utf8(b"Sui 1000-day #");
     std::string::append(&mut name, u64_to_string(counter.value));
     let description = utf8(b"Sui 1000-day anniversary");
-        let image_url = utf8(b"https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=facearea&w=800&q=80");
+        let image_url = utf8(b"https://raw.githubusercontent.com/hoh-zone/Sui-NFT-1000/refs/heads/main/frontend/public/sui-1000-days.svg");
     let date = 0;
     let message = utf8(b"In loving memory.");
         let nft = Memorial {
