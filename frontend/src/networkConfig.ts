@@ -20,8 +20,8 @@ const { networkConfig, useNetworkVariable, useNetworkVariables } =
     mainnet: {
       url: getFullnodeUrl("mainnet"),
       variables: {
-        packageId: "0x6620cd74f948a68149aa613b050706782cad2be8e07a9dfe64cdcf81c90367d5",
-        counterId: "0x76bcdebb7bd2ce2ce64976d9a5c5c79c9db367c38ff15b1b059eea26ab44bbb0",
+        packageId: "0xa67ccf398895e165b519ce7c1f714b5d4862ed2be94cc102affd54a8930a05d5",
+        counterId: "0xd2a7c97a6ddebef6b3e1d8afdc395e846719c1842db1d22afc6a5ebecaabb9b2",
       },
     },
   });

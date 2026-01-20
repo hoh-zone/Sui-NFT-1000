@@ -52,13 +52,23 @@ function App() {
             mintDesc: "连接钱包即可铸造纪念 NFT，编号与图像写入链上，永久可查。",
             themeButton: appearance === "dark" ? "浅色主题" : "深色主题",
             languageButton: "English",
+            noticeTitle: "提示",
+            notices: [
+              "本 NFT 仅供纪念，不构成任何权益或收益承诺。",
+              "每个地址仅可铸造一次。",
+              "活动方保留最终解释权。",
+            ],
             mintStrings: {
               mint: "铸造纪念 NFT",
               minting: "铸造中...",
+              minted: "已铸造",
               connectWallet: "请先连接钱包再进行铸造。",
               setConfig: "请在 src/networkConfig.ts 配置 packageId 和 counterId。",
               waitingCounter: "等待共享 Counter 对象。",
               mintedCount: (count: number) => `已铸造数量：${count}`,
+              alreadyMinted: "你已铸造过了，每个地址只能铸造一次。",
+              progressLabel: (count: number, max: number) =>
+                `进度：${count}/${max}`,
               viewOnSuiVision: "在 suivision.xyz 查看",
             },
           }
@@ -70,13 +80,23 @@ function App() {
             mintDesc: "Connect a wallet to mint. The number and image are stored on-chain.",
             themeButton: appearance === "dark" ? "Light Theme" : "Dark Theme",
             languageButton: "中文",
+            noticeTitle: "Notice",
+            notices: [
+              "This NFT is for commemorative purposes only and carries no rights or guarantees.",
+              "Each address can mint only once.",
+              "The organizer reserves the right of final interpretation.",
+            ],
             mintStrings: {
               mint: "Mint Memorial NFT",
               minting: "Minting...",
+              minted: "Minted",
               connectWallet: "Connect a wallet to mint.",
               setConfig: "Set packageId and counterId in src/networkConfig.ts.",
               waitingCounter: "Waiting for shared Counter object.",
               mintedCount: (count: number) => `Minted count: ${count}`,
+              alreadyMinted: "You have already minted. One per address.",
+              progressLabel: (count: number, max: number) =>
+                `Progress: ${count}/${max}`,
               viewOnSuiVision: "View on suivision.xyz",
             },
           },
@@ -123,6 +143,16 @@ function App() {
               </Text>
               </Box>
               <MintMemorialNft strings={copy.mintStrings} />
+              <Box className="notice-panel">
+                <Heading size="3">{copy.noticeTitle}</Heading>
+                <Flex direction="column" gap="2">
+                  {copy.notices.map((notice) => (
+                    <Text key={notice} size="2" color="gray">
+                      {notice}
+                    </Text>
+                  ))}
+                </Flex>
+              </Box>
             </Flex>
           </div>
         </Container>

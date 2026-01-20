@@ -3,6 +3,7 @@ module memorial_nft::memorial;
 use std::string::{String, utf8};
 use sui::display;
 use sui::package;
+use sui::table;
 
 /// One-time witness for initializing the package.
 public struct MEMORIAL has drop {}
@@ -11,13 +12,15 @@ public struct MEMORIAL has drop {}
 public struct Counter has key, store {
     id: sui::object::UID,
     value: u64,
+    minted: table::Table<address, bool>,
 }
 
 const MAX_SUPPLY: u64 = 100000;
 const EMaxSupply: u64 = 0;
+const EAlreadyMinted: u64 = 1;
 
 /// A simple memorial NFT object.
-    public struct Memorial has key, store {
+public struct Memorial has key, store {
     id: sui::object::UID,
     name: String,
     description: String,
@@ -28,7 +31,7 @@ const EMaxSupply: u64 = 0;
 }
 
 /// Event emitted when a memorial NFT is minted.
-    public struct MemorialMinted has copy, drop {
+public struct MemorialMinted has copy, drop {
     object_id: sui::object::ID,
     recipient: address,
 }
@@ -52,7 +55,7 @@ fun init(otw: MEMORIAL, ctx: &mut sui::tx_context::TxContext) {
         utf8(b"{message}"),
         utf8(b"{creator}"),
     ];
-        let mut display_obj = display::new_with_fields<Memorial>(&publisher, keys, values, ctx);
+    let mut display_obj = display::new_with_fields<Memorial>(&publisher, keys, values, ctx);
     display::update_version(&mut display_obj);
     sui::transfer::public_transfer(publisher, sui::tx_context::sender(ctx));
     sui::transfer::public_transfer(display_obj, sui::tx_context::sender(ctx));
@@ -60,22 +63,27 @@ fun init(otw: MEMORIAL, ctx: &mut sui::tx_context::TxContext) {
     let counter = Counter {
         id: sui::object::new(ctx),
         value: 0,
+        minted: table::new<address, bool>(ctx),
     };
     sui::transfer::share_object(counter);
 }
 
 /// Mint a memorial NFT with default metadata to the sender.
-    public entry fun mint(counter: &mut Counter, ctx: &mut sui::tx_context::TxContext) {
+public entry fun mint(counter: &mut Counter, ctx: &mut sui::tx_context::TxContext) {
     let creator = sui::tx_context::sender(ctx);
+    assert!(!table::contains(&counter.minted, creator), EAlreadyMinted);
     assert!(counter.value < MAX_SUPPLY, EMaxSupply);
     counter.value = counter.value + 1;
+    table::add(&mut counter.minted, creator, true);
     let mut name = utf8(b"Sui 1000-day #");
     std::string::append(&mut name, u64_to_string(counter.value));
     let description = utf8(b"Sui 1000-day anniversary");
-        let image_url = utf8(b"https://raw.githubusercontent.com/hoh-zone/Sui-NFT-1000/refs/heads/main/frontend/public/sui-1000-days.svg");
+    let image_url = utf8(
+        b"https://raw.githubusercontent.com/hoh-zone/Sui-NFT-1000/refs/heads/main/frontend/public/sui-1000-days.svg",
+    );
     let date = 0;
-    let message = utf8(b"In loving memory.");
-        let nft = Memorial {
+    let message = utf8(b"I love Sui");
+    let nft = Memorial {
         id: sui::object::new(ctx),
         name,
         description,
@@ -85,7 +93,7 @@ fun init(otw: MEMORIAL, ctx: &mut sui::tx_context::TxContext) {
         creator,
     };
 
-        sui::event::emit(MemorialMinted {
+    sui::event::emit(MemorialMinted {
         object_id: sui::object::id(&nft),
         recipient: creator,
     });
@@ -105,4 +113,3 @@ fun u64_to_string(value: u64): String {
     digits.reverse();
     digits.to_string()
 }
-

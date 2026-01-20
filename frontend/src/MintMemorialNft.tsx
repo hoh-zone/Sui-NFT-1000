@@ -7,11 +7,14 @@ import { useNetworkVariable } from "./networkConfig";
 type MintMemorialNftStrings = {
   mint: string;
   minting: string;
+  minted: string;
   connectWallet: string;
   setConfig: string;
   waitingCounter: string;
   mintedCount: (count: number) => string;
+  alreadyMinted: string;
   viewOnSuiVision: string;
+  progressLabel: (count: number, max: number) => string;
 };
 
 type MintMemorialNftProps = {
@@ -25,7 +28,11 @@ export function MintMemorialNft({ strings }: MintMemorialNftProps) {
   const { mutate: signAndExecuteTransaction, isPending, data, error } =
     useSignAndExecuteTransaction();
 
-  const { data: counterObject, isPending: isCounterPending } = useSuiClientQuery(
+  const {
+    data: counterObject,
+    isPending: isCounterPending,
+    refetch: refetchCounter,
+  } = useSuiClientQuery(
     "getObject",
     {
       id: counterId,
@@ -36,6 +43,25 @@ export function MintMemorialNft({ strings }: MintMemorialNftProps) {
     },
     {
       enabled: !!counterId && counterId !== "0x0",
+    },
+  );
+
+  const {
+    data: mintRecord,
+    error: mintRecordError,
+    isPending: isMintRecordPending,
+    refetch: refetchMintRecord,
+  } = useSuiClientQuery(
+    "getDynamicFieldObject",
+    {
+      parentId: counterId,
+      name: {
+        type: "address",
+        value: account?.address ?? "",
+      },
+    },
+    {
+      enabled: !!account && counterId !== "0x0",
     },
   );
 
@@ -61,6 +87,27 @@ export function MintMemorialNft({ strings }: MintMemorialNftProps) {
     return null;
   }, [counterObject]);
 
+  const maxSupply = 100000;
+  const progressValue =
+    counterValue !== null ? Math.min(counterValue, maxSupply) : 0;
+  const progressPercent = Math.round((progressValue / maxSupply) * 100);
+
+  const hasMinted = useMemo(() => {
+    if (mintRecord?.data?.objectId) {
+      return true;
+    }
+    const message = mintRecordError?.message?.toLowerCase() ?? "";
+    if (message.includes("not found") || message.includes("does not exist")) {
+      return false;
+    }
+    return false;
+  }, [mintRecord, mintRecordError]);
+
+  const showMintRecordError =
+    mintRecordError &&
+    !mintRecordError.message.toLowerCase().includes("not found") &&
+    !mintRecordError.message.toLowerCase().includes("does not exist");
+
   const handleMint = () => {
     if (!sharedVersion) return;
     const tx = new Transaction();
@@ -75,7 +122,15 @@ export function MintMemorialNft({ strings }: MintMemorialNftProps) {
       ],
     });
 
-    signAndExecuteTransaction({ transaction: tx });
+    signAndExecuteTransaction(
+      { transaction: tx },
+      {
+        onSuccess: () => {
+          refetchCounter();
+          refetchMintRecord();
+        },
+      },
+    );
   };
 
   const disabled =
@@ -84,12 +139,14 @@ export function MintMemorialNft({ strings }: MintMemorialNftProps) {
     packageId === "0x0" ||
     counterId === "0x0" ||
     isPending ||
-    isCounterPending;
+    isCounterPending ||
+    isMintRecordPending ||
+    hasMinted;
 
   return (
     <Flex direction="column" gap="2">
       <Button onClick={handleMint} disabled={disabled}>
-        {isPending ? strings.minting : strings.mint}
+        {hasMinted ? strings.minted : isPending ? strings.minting : strings.mint}
       </Button>
       {!account ? (
         <Text size="2" color="gray">
@@ -106,9 +163,30 @@ export function MintMemorialNft({ strings }: MintMemorialNftProps) {
           {strings.waitingCounter}
         </Text>
       ) : null}
-      {counterValue !== null ? (
+      {hasMinted ? (
         <Text size="2" color="gray">
-          {strings.mintedCount(counterValue)}
+          {strings.alreadyMinted}
+        </Text>
+      ) : null}
+      {counterValue !== null ? (
+        <Flex direction="column" gap="1">
+          <Text size="2" color="gray">
+            {strings.mintedCount(counterValue)}
+          </Text>
+          <div className="mint-progress">
+            <div
+              className="mint-progress-bar"
+              style={{ width: `${progressPercent}%` }}
+            />
+          </div>
+          <Text size="1" color="gray">
+            {strings.progressLabel(progressValue, maxSupply)}
+          </Text>
+        </Flex>
+      ) : null}
+      {showMintRecordError ? (
+        <Text size="2" color="red">
+          {mintRecordError.message}
         </Text>
       ) : null}
       {error ? (
