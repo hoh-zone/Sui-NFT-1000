@@ -79,7 +79,7 @@ public entry fun mint(counter: &mut Counter, ctx: &mut sui::tx_context::TxContex
     std::string::append(&mut name, u64_to_string(counter.value));
     let description = utf8(b"Sui 1000-day anniversary");
     let image_url = utf8(
-        b"https://raw.githubusercontent.com/hoh-zone/Sui-NFT-1000/refs/heads/main/frontend/public/sui-1000-days.svg",
+        b"https://raw.githubusercontent.com/hoh-zone/Sui-NFT-1000/refs/heads/main/frontend/public/sui1000.gif",
     );
     let date = 0;
     let message = utf8(b"I love Sui");
