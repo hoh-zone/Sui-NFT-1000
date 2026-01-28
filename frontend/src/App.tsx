@@ -62,6 +62,7 @@ function App() {
               mint: "铸造纪念 NFT",
               minting: "铸造中...",
               minted: "已铸造",
+              connectWalletCta: "连接钱包",
               connectWallet: "请先连接钱包再进行铸造。",
               setConfig: "请在 src/networkConfig.ts 配置 packageId 和 counterId。",
               waitingCounter: "等待共享 Counter 对象。",
@@ -75,8 +76,8 @@ function App() {
         : {
             title: "Sui 1000 Days",
             badge: "1000 Days",
-            subtitle: "Celebrate Sui’s 1000‑day milestone on-chain.",
-            mintTitle: "Mint the 1000‑Day NFT",
+            subtitle: "Celebrate Sui’s 1000 days milestone on-chain.",
+            mintTitle: "Mint the 1000 days NFT",
             mintDesc: "Connect a wallet to mint. The number and image are stored on-chain.",
             themeButton: appearance === "dark" ? "Light Theme" : "Dark Theme",
             languageButton: "中文",
@@ -90,6 +91,7 @@ function App() {
               mint: "Mint Memorial NFT",
               minting: "Minting...",
               minted: "Minted",
+              connectWalletCta: "Connect Wallet",
               connectWallet: "Connect a wallet to mint.",
               setConfig: "Set packageId and counterId in src/networkConfig.ts.",
               waitingCounter: "Waiting for shared Counter object.",
@@ -110,7 +112,7 @@ function App() {
         <div className="background-glow" aria-hidden="true" />
 
         <Flex className="app-nav" position="sticky" px="4" py="3" justify="between">
-          <Flex direction="column" gap="1">
+          <Flex className="nav-title" direction="column" gap="1">
             <Flex align="center" gap="2">
               <Heading size="6">{copy.title}</Heading>
               <Badge variant="outline" radius="full">
@@ -122,7 +124,7 @@ function App() {
             </Text>
           </Flex>
 
-          <Flex gap="2" align="center">
+          <Flex className="nav-actions" gap="2" align="center" wrap="wrap">
             <Button className="glow-button" variant="soft" onClick={toggleTheme}>
               {copy.themeButton}
             </Button>

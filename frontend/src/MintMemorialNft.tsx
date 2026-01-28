@@ -1,13 +1,16 @@
 import { useCurrentAccount, useSignAndExecuteTransaction, useSuiClientQuery } from "@mysten/dapp-kit";
+import { ConnectButton } from "@mysten/dapp-kit";
 import { Transaction } from "@mysten/sui/transactions";
 import { Button, Flex, Link, Text } from "@radix-ui/themes";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNetworkVariable } from "./networkConfig";
+import { ConfettiBurst } from "./ConfettiBurst";
 
 type MintMemorialNftStrings = {
   mint: string;
   minting: string;
   minted: string;
+  connectWalletCta: string;
   connectWallet: string;
   setConfig: string;
   waitingCounter: string;
@@ -28,6 +31,17 @@ export function MintMemorialNft({ strings }: MintMemorialNftProps) {
   const { mutate: signAndExecuteTransaction, isPending, data, error } =
     useSignAndExecuteTransaction();
 
+  // Local UI state: make button disabled immediately after a successful receipt,
+  // without waiting for chain refetch.
+  const [mintedLocal, setMintedLocal] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
+
+  // Reset local UI state when wallet address changes.
+  useEffect(() => {
+    setMintedLocal(false);
+    setShowConfetti(false);
+  }, [account?.address]);
+
   const {
     data: counterObject,
     isPending: isCounterPending,
@@ -46,6 +60,21 @@ export function MintMemorialNft({ strings }: MintMemorialNftProps) {
     },
   );
 
+  // Counter stores `minted: table::Table<address, bool>`.
+  // Dynamic fields are stored under the Table's internal UID, not under Counter's object id.
+  const mintedTableId = useMemo(() => {
+    const content = counterObject?.data?.content;
+    if (!content || content.dataType !== "moveObject") return null;
+    const fields = content.fields as any;
+    const minted = fields?.minted;
+    const id =
+      minted?.fields?.id?.id ??
+      minted?.fields?.id ??
+      minted?.id?.id ??
+      minted?.id;
+    return typeof id === "string" ? id : null;
+  }, [counterObject]);
+
   const {
     data: mintRecord,
     error: mintRecordError,
@@ -54,14 +83,14 @@ export function MintMemorialNft({ strings }: MintMemorialNftProps) {
   } = useSuiClientQuery(
     "getDynamicFieldObject",
     {
-      parentId: counterId,
+      parentId: mintedTableId ?? "0x0",
       name: {
         type: "address",
         value: account?.address ?? "",
       },
     },
     {
-      enabled: !!account && counterId !== "0x0",
+      enabled: !!account && !!mintedTableId,
     },
   );
 
@@ -97,7 +126,12 @@ export function MintMemorialNft({ strings }: MintMemorialNftProps) {
       return true;
     }
     const message = mintRecordError?.message?.toLowerCase() ?? "";
-    if (message.includes("not found") || message.includes("does not exist")) {
+    if (
+      message.includes("not found") ||
+      message.includes("does not exist") ||
+      message.includes("dynamicfield") ||
+      message.includes("dynamic field")
+    ) {
       return false;
     }
     return false;
@@ -107,6 +141,11 @@ export function MintMemorialNft({ strings }: MintMemorialNftProps) {
     mintRecordError &&
     !mintRecordError.message.toLowerCase().includes("not found") &&
     !mintRecordError.message.toLowerCase().includes("does not exist");
+
+  // If we detect on-chain minted status, sync local state.
+  useEffect(() => {
+    if (hasMinted) setMintedLocal(true);
+  }, [hasMinted]);
 
   const handleMint = () => {
     if (!sharedVersion) return;
@@ -126,12 +165,17 @@ export function MintMemorialNft({ strings }: MintMemorialNftProps) {
       { transaction: tx },
       {
         onSuccess: () => {
+          setMintedLocal(true);
+          setShowConfetti(true);
+          window.setTimeout(() => setShowConfetti(false), 2200);
           refetchCounter();
           refetchMintRecord();
         },
       },
     );
   };
+
+  const isMinted = hasMinted || mintedLocal;
 
   const disabled =
     !account ||
@@ -141,13 +185,18 @@ export function MintMemorialNft({ strings }: MintMemorialNftProps) {
     isPending ||
     isCounterPending ||
     isMintRecordPending ||
-    hasMinted;
+    isMinted;
 
   return (
-    <Flex direction="column" gap="2">
-      <Button onClick={handleMint} disabled={disabled}>
-        {hasMinted ? strings.minted : isPending ? strings.minting : strings.mint}
-      </Button>
+    <Flex className="mint-widget" direction="column" gap="2">
+      <ConfettiBurst active={showConfetti} />
+      {!account ? (
+        <ConnectButton className="mint-connect" connectText={strings.connectWalletCta} />
+      ) : (
+        <Button onClick={handleMint} disabled={disabled}>
+          {isMinted ? strings.minted : isPending ? strings.minting : strings.mint}
+        </Button>
+      )}
       {!account ? (
         <Text size="2" color="gray">
           {strings.connectWallet}
@@ -163,7 +212,7 @@ export function MintMemorialNft({ strings }: MintMemorialNftProps) {
           {strings.waitingCounter}
         </Text>
       ) : null}
-      {hasMinted ? (
+      {isMinted ? (
         <Text size="2" color="gray">
           {strings.alreadyMinted}
         </Text>

@@ -75,11 +75,11 @@ public entry fun mint(counter: &mut Counter, ctx: &mut sui::tx_context::TxContex
     assert!(counter.value < MAX_SUPPLY, EMaxSupply);
     counter.value = counter.value + 1;
     table::add(&mut counter.minted, creator, true);
-    let mut name = utf8(b"Sui 1000-day #");
+    let mut name = utf8(b"Sui 1000 Days #");
     std::string::append(&mut name, u64_to_string(counter.value));
-    let description = utf8(b"Sui 1000-day anniversary");
+    let description = utf8(b"Sui 1000 Days anniversary");
     let image_url = utf8(
-        b"https://raw.githubusercontent.com/hoh-zone/Sui-NFT-1000/refs/heads/main/frontend/public/sui1000.gif",
+        b"https://raw.githubusercontent.com/hoh-zone/Sui-NFT-1000/refs/heads/main/frontend/public/Sui1000.gif",
     );
     let date = 0;
     let message = utf8(b"I love Sui");

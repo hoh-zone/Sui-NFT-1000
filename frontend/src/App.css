@@ -78,6 +78,56 @@
   box-shadow: 0 0 16px rgba(99, 164, 255, 0.35);
 }
 
+.mint-connect {
+  width: 100%;
+}
+
+@media (max-width: 640px) {
+  .app-content {
+    padding-top: 18px;
+  }
+
+  .app-nav {
+    padding-top: 14px !important;
+    padding-bottom: 14px !important;
+  }
+
+  .app-nav,
+  .app-nav > * {
+    gap: 12px;
+  }
+
+  .nav-title {
+    width: 100%;
+  }
+
+  .nav-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .nav-actions > * {
+    flex: 1 1 auto;
+  }
+
+  .nav-actions button {
+    width: 100%;
+  }
+
+  .card-panel {
+    padding: 18px;
+    border-radius: 16px;
+  }
+
+  .notice-panel {
+    padding: 14px;
+  }
+
+  .mint-widget button {
+    width: 100%;
+  }
+}
+
 @media (prefers-color-scheme: light) {
   .background-grid {
     background-image:

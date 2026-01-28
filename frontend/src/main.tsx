@@ -12,12 +12,12 @@ const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <QueryClientProvider client={queryClient}>
+      <QueryClientProvider client={queryClient}>
       <SuiClientProvider networks={networkConfig} defaultNetwork="mainnet">
-        <WalletProvider autoConnect>
-          <App />
-        </WalletProvider>
-      </SuiClientProvider>
-    </QueryClientProvider>
+          <WalletProvider autoConnect>
+            <App />
+          </WalletProvider>
+        </SuiClientProvider>
+      </QueryClientProvider>
   </React.StrictMode>,
 );
